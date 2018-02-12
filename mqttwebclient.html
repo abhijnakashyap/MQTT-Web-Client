@@ -1,0 +1,137 @@
+<!-- 
+Author: Abhijna Kashyap
+Date: 9th Feb 2018
+Description: This is sample code for sending and receiving MQTT messages over WebSockets
+Website: http://iotcreations.co.nf/ || http://thinginfinity.co.nf/
+-->
+
+
+<!DOCTYPE HTML>
+<html>
+   <head>
+    
+  <!-- Latest compiled and minified Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+  <!-- Include JQuery library from CDN -->
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+
+  <!-- Include Paho JavaScript MQTT Client from CDN -->
+  <script src="/js/mqttws31.js" type="text/javascript"></script>
+  <link href="https://fonts.googleapis.com/css?family=Oleo+Script:400,700" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Teko:400,700" rel="stylesheet">
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="/js/mqttwebsocketexample.js" type="text/javascript"></script>
+  <meta name="google" content="notranslate">		
+  
+  </head>
+  <body>
+   <style> 
+      body{
+	  font-family: 'Teko', sans-serif;
+      background: #3a6186; /* fallback for old browsers */
+      background: -webkit-linear-gradient(to left, #3a6186 , #89253e); /* Chrome 10-25, Safari 5.1-6 */
+      background: linear-gradient(to left, #3a6186 , #89253e); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+      color : #fff;    
+      }
+	  h1 {
+	   font-family: 'Montserrat', sans-serif;
+	  }
+      .content-header{
+       font-family: 'Oleo Script', cursive;
+       color:#fcc500;
+       font-size: 45px;
+      }
+	  .form-group{
+	  font-size: 1.2em;
+	  }
+	  .btnstyle{
+	  font-size: 1.3em;
+	  }
+	  .txtstyle{
+	  font-size: 1.3em;
+	  }
+	  .title {
+      font-size: 38px;
+      color: #fff;
+      margin-top: 0;
+      }
+      .title .highlight {
+      color: #fff;
+      }
+   </style>
+   <div class="section-content">
+               <!--  <h1 class="title" style="text-align:center;">Thing<span class="highlight">∞</span></h1> -->
+				<h2 class="section-header" style="text-align:center;">MQTT <span class="content-header wow fadeIn " data-wow-delay="0.2s" data-wow-duration="2s"> WebClient</span></h2>
+				<h3 style="text-align:center;">" With MQTT over websockets every browser can be a MQTT device "</h3>
+			</div>
+  <hr>
+    <form class="form-horizontal">
+      <div class="form-group">
+        <label for="txt_MQTT_Broker_URL" class="col-sm-2 control-label">WebSocket MQTT Broker URL:</label>
+        <div class="col-sm-9">
+          <input type="text" class="form-control txtstyle" id="txt_MQTT_Broker_URL">
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="txt_MQTT_Client_ID" class="col-sm-2 control-label">MQTT Client ID:</label>
+        <div class="col-sm-6">
+          <input type="text" class="form-control txtstyle" id="txt_MQTT_Client_ID">
+        </div>
+        <div class="col-sm-4">
+           <button type="button" class="btn btn-success col-sm-4 btnstyle" id="btn_Connect_to_Broker" onclick="mqtt_Connect_with_Broker();"><i class="fa fa-paper-plane" aria-hidden="true"></i> Connect</button>
+        </div>
+      </div>
+      <hr>
+      <div class="form-group">
+        <label for="txt_MQTT_Subscribe_Topic" class="col-sm-2 control-label">MQTT Topic (Subscribe):</label>
+        <div class="col-sm-6">
+          <input type="text" class="form-control txtstyle" id="txt_MQTT_Subscribe_Topic" placeholder="Type MQTT Topic here...">
+        </div>
+          <div class="col-sm-4">
+           <button type="button" class="btn btn-primary col-sm-4 btnstyle" onclick="mqtt_Subscribe_to_Topic();"><i class="fa fa-address-book-o" aria-hidden="true"></i> Subscribe</button>
+        </div>      
+      </div>
+    </form>
+
+    <hr>
+
+    <form class="form-horizontal">
+
+       <div class="form-group">
+         <label class="col-sm-2 control-label" for="txt_MQTT_Publish_Topic">MQTT Topic (Publish):</label>
+         <div class="col-sm-6">
+           <input type="text" class="form-control txtstyle" id="txt_MQTT_Publish_Topic" placeholder="Type MQTT Topic here...">
+         </div>
+       </div>
+
+       <div class="form-group">
+         <label class="col-sm-2 control-label" for="txt_MQTT_Msg">MQTT Message:</label>
+         <div class="col-sm-6">
+           <input type="text" class="form-control txtstyle" id="txt_MQTT_Msg" placeholder="Type MQTT Message here...">
+         </div>
+         <div class="col-sm-4">
+           <button type="button" class="btn btn-primary col-sm-4 btnstyle"  onclick="mqtt_Publish_Message();" ><i class="fa fa-bullhorn" aria-hidden="true"></i> Publish</button>
+         </div>
+       </div>
+     </form>
+
+      <hr>
+
+    <form class="form-horizontal">
+       <div class="form-group">
+         <label class="col-sm-2 control-label" for="txtAr_Console">Console:</label>
+         <div class="col-sm-9">
+           <textarea ype="textarea" class="form-control txtstyle" rows="12" cols="100" id="txtAr_Console"></textarea>
+         </div>
+       </div>
+       <div class="form-group">
+        <label class="col-sm-2 control-label" for="btn_Clear_Console"></label>
+         <div class="col-sm-4">
+           <button type="button" id="btn_Clear_Console" class="btn btn-warning col-sm-4 btnstyle"  onclick="clear_Console();" ><i class="fa fa-trash-o" aria-hidden="true"></i> Clear Console</button>
+         </div>
+       </div>
+     </form>
+      
+   </body>
+</html>
